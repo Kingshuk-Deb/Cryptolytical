@@ -14,8 +14,8 @@ const nodemailer = require('nodemailer');
 
 // Constant Values
 const uri = `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@analysisdata.pwnel.mongodb.net/${process.env.MONGO_DBNAME}?retryWrites=true&w=majority`;
-const cryptoNewsUrl = 'https://www.moneycontrol.com/news/business/cryptocurrency/page-';
-const cryptoDataUrl = 'https://crypto.com/price?page=';
+const cryptoNewsUrl = process.env.NEWS_DATA_URL;
+const cryptoDataUrl = process.env.CRYPTO_DATA_URL;
 const cryptoDataArrCM = [];
 const cryptoNewsArrMC = [];
 const cryptoSentArrTwit = [];
