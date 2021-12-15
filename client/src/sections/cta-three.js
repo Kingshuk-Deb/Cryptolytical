@@ -15,7 +15,7 @@ const CtaThree = () => {
     fetch('http://cryptolytical.herokuapp.com/api/cryptosentiment', {
       method: "GET",
       headers: {
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImtpbmdzaHVrIiwiZW1haWwiOiJraW5nc2h1a2RlYjAwN0BnbWFpbC5jb20iLCJpYXQiOjE2Mzk0Njk5NzF9.KuAI4h1omHp2p2MFeJ8U9aErGg2fW8xV8F-KhUvd2X8",
+        "Authorization": "Bearer Token",
       },
     }).then(function(response) {
       return response.json();
