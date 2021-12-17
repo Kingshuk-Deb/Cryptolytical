@@ -1,39 +1,39 @@
 import { Box, Flex, Text, Grid, Heading, Container } from 'theme-ui';
-import React, { useState } from 'react';
-import { Link } from 'components/link';
+import React, { useState, useEffect } from 'react';
 import BlockTitle from 'components/block-title';
-let totScoreAvg;
-let totCompAvg;
-let trending1;
-let trending1sc;
-let trending2;
-let trending2sc;
 
 const CtaThree = () => {
-  const [data, setData] = useState([]);
-  try {
-    fetch('http://cryptolytical.herokuapp.com/api/cryptosentiment', {
-      method: "GET",
-      headers: {
-        "Authorization": "Bearer Token",
-      },
-    }).then(function(response) {
-      return response.json();
-    }).then(function(sentimentData) {
-      sentimentData.result.map((sentiment) => {
-        trending1 = sentiment[0].query.toString();
-        trending1sc = sentiment[0].sentimentScore;
-        trending2 = sentiment[2].query;
-        trending2sc = sentiment[2].sentimentScore;
-        totScoreAvg = sentimentData.result[0].totScoreAvg;
-        totCompAvg = sentimentData.result[0].totCompAvg.toString().substr(1, 4);
+  const [totScoreAvg, setTotScoreAvg] = useState([]);
+  const [totCompAvg, setTotCompAvg] = useState([]);
+  const [trending1, setTrending1] = useState([]);
+  const [trending2, setTrending2] = useState([]);
+  const [trending1sc, setTrending1sc] = useState([]);
+  const [trending2sc, setTrending2sc] = useState([]);
+
+  useEffect(() => {
+    try {
+      fetch('http://cryptolytical.herokuapp.com/api/cryptosentiment', {
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer Token",
+        },
+      }).then(function(response) {
+        return response.json();
+      }).then(function(sentimentData) {
+        setTrending1(sentimentData.result[0][0].query);
+        setTrending1sc(sentimentData.result[0][0].sentimentScore);
+        setTrending2(sentimentData.result[0][1].query);
+        setTrending2sc(sentimentData.result[0][1].sentimentScore);
+        setTotScoreAvg(sentimentData.result[0].totScoreAvg.toString());
+        setTotCompAvg(sentimentData.result[0].totCompAvg.toString().substr(1, 4));
+        console.log(sentimentData.result[0].totScoreAvg.toString(), sentimentData.result[0].totCompAvg.toString().substr(1, 4));
       })
-      setData(sentimentData.result);
-    })
-  } catch (e) {
-    console.error(e);
-    console.log("there as an error");
-  }
+    } catch (e) {
+      console.error(e);
+      console.log("there as an error");
+    }  
+  }, []);
+
   return (
     <Box as="section" sx={styles.ctaThree}>
       <Container>
