@@ -96,8 +96,34 @@ async function getCryptoData () {
                 cryptoDataArrCM.push({rank, name, abbr, link, price, h24Change, h24Volume, marketCap});
             });
         }
-        console.log('I am fetched every 30 second!');
+        console.log('I am updated every 30 second!');
     } catch(err) { console.error(err); }
+}
+
+// Function that does sentiment analysis of a specified term through Twitter
+function getCryptoSentiment (query) {
+    T.get('search/tweets', { q: query, count: 10000 }, function(err, data, response) {
+        let textall = '';
+        data.statuses.map((tweets) => {
+            let text = tweets.text;
+            text = text.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, "");
+            text = text.replace('@', "");
+            text = text.replace('RT', "");
+            textall += text;
+        });
+        let sentimentScore = sentiment.analyze(textall).score;
+        let sentimentComparative = sentiment.analyze(textall).comparative;
+        cryptoSentArrTwit.push({query, sentimentScore, sentimentComparative});
+    });
+}
+// Function that iterates through all the popular hashtags of Twitter
+function getCryptoSentimentTotal () {
+    let id = 0;
+    for (let i = 0; i < 10; i++) {
+        getCryptoSentiment (queries[id]);
+        id = id + 1;
+    }
+    console.log('I am updated every 10 Minutes!');
 }
 
 // Function that fetches data Crypto Data
@@ -126,35 +152,8 @@ async function getCryptoNews () {
                 cryptoNewsArrMC.push({id, title, desc, link, image, timeStamp});
             });
         }
-        console.log('I am fetched every 1 hour!');
+        console.log('I am updated every 1 hour!');
     } catch(err) { console.error(err); }
-}
-
-// Function that does sentiment analysis of a specified term through Twitter
-function getCryptoSentiment (query) {
-    T.get('search/tweets', { q: query, count: 10000 }, function(err, data, response) {
-        let textall = '';
-        data.statuses.map((tweets) => {
-            let text = tweets.text;
-            text = text.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, "");
-            text = text.replace('@', "");
-            text = text.replace('RT', "");
-            textall += text;
-        });
-        let sentimentScore = sentiment.analyze(textall).score;
-        let sentimentComparative = sentiment.analyze(textall).comparative;
-        cryptoSentArrTwit.push({query, sentimentScore, sentimentComparative});
-    });
-}
-
-// Function that iterates through all the popular hashtags of Twitter
-function getCryptoSentimentTotal () {
-    let id = 0;
-    for (let i = 0; i < 10; i++) {
-        getCryptoSentiment (queries[id]);
-        id = id + 1;
-    }
-    console.log('I am fetched every 15 Minutes!');
 }
 
 // For Co-Relation Testing Purposes
@@ -181,18 +180,29 @@ function setDataForAnalysis () {
         await Crypto.create(newCrypto);
         return;
     });
+    console.log('I am sent every 10 minutes!');
 }
 
 // Function that sets values initially
-setTimeout(getCryptoData, 0); setInterval(getCryptoData, 30000);
-setTimeout(getCryptoSentimentTotal, 0); setInterval(getCryptoSentimentTotal, 600000);
-setTimeout(getCryptoNews, 0); setInterval(getCryptoNews, 3600000);
+setTimeout(getCryptoData, 0); setInterval(function(){
+    while (cryptoDataArrCM.length) { 
+        cryptoDataArrCM.pop();
+    }
+    getCryptoData();
+}, 30000);
+setTimeout(getCryptoSentimentTotal, 0); setInterval(function(){
+    while (cryptoSentArrTwit.length) { 
+        cryptoSentArrTwit.pop(); 
+    }
+    getCryptoSentimentTotal();
+}, 600000);
+setTimeout(getCryptoNews, 0); setInterval(function(){
+    while (cryptoNewsArrMC.length) { 
+        cryptoNewsArrMC.pop(); 
+    }
+    getCryptoNews();
+}, 3600000);
 setTimeout(setDataForAnalysis, 35000); setInterval(setDataForAnalysis, 605677);
-// Function that resets the values
-setInterval(function(){ while (cryptoDataArrCM.length) { cryptoDataArrCM.pop(); } }, 29950);
-setInterval(function(){ while (cryptoSentArrTwit.length) { cryptoSentArrTwit.pop(); }}, 599800);
-setInterval(function(){ while (cryptoNewsArrMC.length) { cryptoNewsArrMC.pop(); }}, 3599800);
-
 
 // Details
 app.get('/', async (req, res) => { res.send("Make request to /api/signup to create user and then to /api/cryptodata, /api/cryptonews and /api/cryptosentiment for top 200 realtime crypto news, data and current sentiment.") });
