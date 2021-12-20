@@ -242,7 +242,7 @@ app.post('/api/signup', async (req, res) => {
     } catch (e) { res.status(500).json(e);}
 });
 
-// Url that suthenticates users
+// URL that authenticate users
 app.get('/api/confirmation/:token', authenticateSignupToken, async (req, res) => {
     try {
         const newUser = new Users({
